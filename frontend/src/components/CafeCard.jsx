@@ -1,7 +1,18 @@
-function CafeCard({ name, rating, distance, mood, aestheticScore }) {
+function CafeCard({
+  name,
+  rating,
+  distance,
+  mood,
+  aestheticScore,
+  onClick,
+}) {
   return (
-    <div className="cafe-card">
-      <h3>{name}</h3>
+    <div
+      className="cafe-card"
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
+    >
+      <h2>{name}</h2>
 
       <p>⭐ {rating}</p>
 

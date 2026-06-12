@@ -6,6 +6,7 @@ import "./App.css";
 function App() {
   const [cafes, setCafes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCafe, setSelectedCafe] = useState(null);
 
   const filteredCafes = cafes.filter((cafe) =>
     cafe.name.toLowerCase().includes(
@@ -57,6 +58,7 @@ function App() {
                     : "Friends Hangout"
                 }
                 aestheticScore={cafe.aestheticScore}
+                onClick={() => setSelectedCafe(cafe)}
               />
             ))
           )}
@@ -64,7 +66,10 @@ function App() {
         </div>
 
         <div className="map-container">
-          <Map setCafes={setCafes} />
+          <Map
+            setCafes={setCafes}
+            selectedCafe={selectedCafe}
+          />
         </div>
 
       </div>
