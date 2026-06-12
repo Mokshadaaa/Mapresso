@@ -6,9 +6,11 @@ import {
   useMap,
 } from "react-leaflet";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import "leaflet/dist/leaflet.css";
+
+
 
 function FlyToCafe({ selectedCafe }) {
   const map = useMap();
@@ -122,11 +124,18 @@ function Map({
               place.lat,
               place.lon
             ),
+            
             aestheticScore: (
               Math.random() * 3 +
               7
             ).toFixed(1),
-          }));
+          }))
+          .sort(
+            (a, b) =>
+              Number(a.distance) -
+              Number(b.distance)
+          );
+          
 
         setNearbyCafes(cafes);
         setCafes(cafes);
@@ -175,23 +184,20 @@ function Map({
         </Popup>
       </Marker>
 
-      {nearbyCafes.map(
-        (cafe, index) => (
-          <Marker
-            key={index}
-            position={[
-              cafe.lat,
-              cafe.lon,
-            ]}
-          >
-            <Popup>
-              <strong>
-                {cafe.name}
-              </strong>
-            </Popup>
-          </Marker>
-        )
-      )}
+      {nearbyCafes.map((cafe, index) => (
+        <Marker
+          key={index}
+          position={[cafe.lat, cafe.lon]}
+        >
+          <Popup>
+            <div>
+              <h3>{cafe.name}</h3>
+              <p>📍 {cafe.distance} km away</p>
+              <p>📸 Score: {cafe.aestheticScore}/10</p>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   );
 }
