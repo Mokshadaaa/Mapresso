@@ -6,11 +6,9 @@ import {
   useMap,
 } from "react-leaflet";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import "leaflet/dist/leaflet.css";
-
-
 
 function FlyToCafe({ selectedCafe }) {
   const map = useMap();
@@ -33,6 +31,7 @@ function FlyToCafe({ selectedCafe }) {
 function Map({
   setCafes,
   selectedCafe,
+  setUserLocation,
 }) {
   const [position, setPosition] = useState([
     19.8762,
@@ -67,7 +66,8 @@ function Map({
           }
         );
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         const calculateDistance = (
           lat1,
@@ -78,10 +78,14 @@ function Map({
           const R = 6371;
 
           const dLat =
-            ((lat2 - lat1) * Math.PI) / 180;
+            ((lat2 - lat1) *
+              Math.PI) /
+            180;
 
           const dLon =
-            ((lon2 - lon1) * Math.PI) / 180;
+            ((lon2 - lon1) *
+              Math.PI) /
+            180;
 
           const a =
             Math.sin(dLat / 2) *
@@ -90,7 +94,8 @@ function Map({
               (lat1 * Math.PI) / 180
             ) *
               Math.cos(
-                (lat2 * Math.PI) / 180
+                (lat2 * Math.PI) /
+                  180
               ) *
               Math.sin(dLon / 2) *
               Math.sin(dLon / 2);
@@ -106,23 +111,30 @@ function Map({
         };
 
         const cafes = data.elements
-          .filter(
-            (place) =>
+          .filter((place) => {
+            return (
               place.tags &&
-              place.tags.name
-          )
+              place.tags.name &&
+              typeof place.lat ===
+                "number" &&
+              typeof place.lon ===
+                "number"
+            );
+          })
           .map((place) => ({
             name: place.tags.name,
             lat: place.lat,
             lon: place.lon,
             rating: "N/A",
-            distance: calculateDistance(
-              lat,
-              lon,
-              place.lat,
-              place.lon
-            ),
-            
+
+            distance:
+              calculateDistance(
+                lat,
+                lon,
+                place.lat,
+                place.lon
+              ),
+
             aestheticScore: (
               Math.random() * 3 +
               7
@@ -133,12 +145,19 @@ function Map({
               Number(a.distance) -
               Number(b.distance)
           );
-          
+
+        console.log(
+          "CAFES FETCHED:",
+          cafes
+        );
 
         setNearbyCafes(cafes);
         setCafes(cafes);
       } catch (error) {
-        console.log(error);
+        console.log(
+          "Error fetching cafes:",
+          error
+        );
       }
     };
 
@@ -150,11 +169,28 @@ function Map({
         const lon =
           pos.coords.longitude;
 
-        setPosition([lat, lon]);
+        setUserLocation({
+          lat,
+          lon,
+        });
+        
+        setPosition([
+          lat,
+          lon,
+        ]);
 
-        fetchNearbyCafes(lat, lon);
+        fetchNearbyCafes(
+          lat,
+          lon
+        );
       },
-      (err) => console.log(err)
+
+      (err) => {
+        console.log(
+          "LOCATION ERROR:",
+          err
+        );
+      }
     );
   }, [setCafes]);
 
@@ -176,26 +212,49 @@ function Map({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
+      {/* User Location */}
       <Marker position={position}>
         <Popup>
           You are here 📍
         </Popup>
       </Marker>
 
-      {nearbyCafes.map((cafe, index) => (
-        <Marker
-          key={index}
-          position={[cafe.lat, cafe.lon]}
-        >
-          <Popup>
-            <div>
-              <h3>{cafe.name}</h3>
-              <p>📍 {cafe.distance} km away</p>
-              <p>📸 Score: {cafe.aestheticScore}/10</p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      {/* Nearby Cafes */}
+      {nearbyCafes.map(
+        (cafe, index) => (
+          <Marker
+            key={index}
+            position={[
+              cafe.lat,
+              cafe.lon,
+            ]}
+          >
+            <Popup>
+              <div>
+                <h3>
+                  {cafe.name}
+                </h3>
+
+                <p>
+                  📍{" "}
+                  {
+                    cafe.distance
+                  }{" "}
+                  km away
+                </p>
+
+                <p>
+                  📸 Score:{" "}
+                  {
+                    cafe.aestheticScore
+                  }
+                  /10
+                </p>
+              </div>
+            </Popup>
+          </Marker>
+        )
+      )}
     </MapContainer>
   );
 }
