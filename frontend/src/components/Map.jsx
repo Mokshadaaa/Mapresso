@@ -52,10 +52,8 @@ function Map({
           [out:json];
 
           (
-            node["amenity"="cafe"](around:5000,${lat},${lon});
-            node["amenity"="restaurant"](around:5000,${lat},${lon});
-            node["amenity"="fast_food"](around:5000,${lat},${lon});
-            node["shop"="bakery"](around:5000,${lat},${lon});
+            node["amenity"="cafe"](around:10000,${lat},${lon});
+            node["shop"="bakery"](around:10000,${lat},${lon});
           );
 
           out;
